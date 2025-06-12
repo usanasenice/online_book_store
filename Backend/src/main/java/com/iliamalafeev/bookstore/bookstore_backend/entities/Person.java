@@ -1,0 +1,217 @@
+package com.iliamalafeev.bookstore.bookstore_backend.entities;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iliamalafeev.bookstore.bookstore_backend.security.entities.Role;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+@Data
+@NoArgsConstructor
+@Entity
+@Table(name = "person")
+public class Person implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @NotBlank(message = "First name must contain at least 1 character")
+    @Size(max = 100, message = "First name length must not exceed 100 characters")
+    @Column(name = "first_name")
+    private String firstName;
+
+    @NotBlank(message = "Last name must contain at least 1 character")
+    @Size(max = 100, message = "Last name length must not exceed 100 characters")
+    @Column(name = "last_name")
+    private String lastName;
+
+    @NotNull(message = "Date cannot be left blank")
+    @Past(message = "Birth date cannot be in the future")
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @NotBlank(message = "Email must contain at least 1 character")
+    @Size(max = 100, message = "Email length must not exceed 100 characters")
+    @Email(message = "This field must be formatted as Email address")
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "password")
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
+
+    @Column(name = "registered_at")
+    private LocalDateTime registeredAt;
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @OneToMany(mappedBy = "checkoutHolder", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Checkout> checkouts;
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @OneToMany(mappedBy = "discussionHolder", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Discussion> discussions;
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @OneToMany(mappedBy = "historyRecordHolder", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<HistoryRecord> historyRecords;
+
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @OneToOne(mappedBy = "paymentHolder", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Payment payment;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public LocalDateTime getRegisteredAt() {
+        return registeredAt;
+    }
+
+    public void setRegisteredAt(LocalDateTime registeredAt) {
+        this.registeredAt = registeredAt;
+    }
+
+    public List<Checkout> getCheckouts() {
+        return checkouts;
+    }
+
+    public void setCheckouts(List<Checkout> checkouts) {
+        this.checkouts = checkouts;
+    }
+
+    public List<Discussion> getDiscussions() {
+        return discussions;
+    }
+
+    public void setDiscussions(List<Discussion> discussions) {
+        this.discussions = discussions;
+    }
+
+    public List<HistoryRecord> getHistoryRecords() {
+        return historyRecords;
+    }
+
+    public void setHistoryRecords(List<HistoryRecord> historyRecords) {
+        this.historyRecords = historyRecords;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
+
+    public Person(String firstName, String lastName, LocalDate dateOfBirth, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.password = password;
+    }
+
+}
